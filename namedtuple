@@ -1,0 +1,12 @@
+from collections import namedtuple
+n=int(input())
+r = input()
+student = namedtuple('student',r.split())
+sum=0
+if n > 0 and n <= 100 :
+    for i in range(n):
+     my_std=student(*input().split())
+     sum = sum + int(my_std.MARKS)
+
+avg=sum/n 
+print('{:.2f}'.format(avg))
