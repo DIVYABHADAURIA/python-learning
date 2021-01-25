@@ -1,0 +1,85 @@
+To better understand DataFrame objects, it's useful to know that they consist of three components, stored as attributes:
+
+.values: A two-dimensional NumPy array of values.
+.columns: An index of columns: the column names.
+.index: An index for the rows: either row numbers or row names.
+
+
+Sorting and Subsetting in pandas 
+
+ You can sort the rows by passing a column name to .sort_values()
+ 
+ one column	              df.sort_values("breed")
+ multiple columns         df.sort_values(["breed", "weight_kg"])
+ 
+ # Sort homelessness by descending family members
+homelessness_fam = homelessness.sort_values("family_members", ascending=False)
+
+# Sort homelessness by region, then descending family members
+homelessness_reg_fam = homelessness.sort_values(["region","family_members"], ascending=[True, False])
+
+To select only "col_a" of the DataFrame df, use
+
+df["col_a"]
+To select "col_a" and "col_b" of df, use
+
+df[["col_a", "col_b"]]
+
+to find a subset of rows that match some criteria. This is sometimes known as filtering rows or selecting rows.
+
+# Select only the individuals and state columns, in that order
+ind_state = homelessness[["individuals", "state"]]
+
+There are many ways to subset a DataFrame, perhaps the most common is to use relational operators to return True or False for each row, then pass that inside square brackets.
+
+dogs[dogs["height_cm"] > 60]
+dogs[dogs["color"] == "tan"]
+
+# Filter for rows where family_members is less than 1000 
+fam_lt_1k_pac = homelessness[ (homelessness["family_members"] < 1000) & 
+(homelessness["region"] == "Pacific")]
+
+# Subset for rows in South Atlantic or Mid-Atlantic regions
+south_mid_atlantic = homelessness[(homelessness["region"] == "South Atlantic" )| (homelessness["region"] == "Mid-Atlantic")]
+
+# The Mojave Desert states
+canu = ["California", "Arizona", "Nevada", "Utah"]
+
+# Filter for rows in the Mojave Desert states
+mojave_homelessness = homelessness[homelessness["state"].isin(canu)]
+
+You aren't stuck with just the data you are given. Instead, you can add new columns to a DataFrame. This has many names, such as transforming, mutating, and feature engineering.
+
+# Add total col as sum of individuals and family_members
+homelessness["total"] = homelessness["individuals"] + homelessness["family_members"]
+
+# Add p_individuals col as proportion of individuals
+homelessness.head()
+homelessness["p_individuals"] = homelessness["individuals"] / homelessness["total"]
+
+
+
+# Create indiv_per_10k col as homeless individuals per 10k state pop
+homelessness["indiv_per_10k"] = 10000 * homelessness["individuals"] / homelessness["state_pop"]
+
+# Subset rows for indiv_per_10k greater than 20
+high_homelessness = homelessness[homelessness["indiv_per_10k"] > 20]
+
+# Sort high_homelessness by descending indiv_per_10k
+high_homelessness_srt = high_homelessness.sort_values("indiv_per_10k", ascending=False)
+
+# From high_homelessness_srt, select the state and indiv_per_10k cols
+result = high_homelessness_srt[["state","indiv_per_10k"]]
+
+# See the result
+print(result)
+
+
+
+colors = ["brown", "black", "tan"]
+condition = dogs["color"].isin(colors)
+dogs[condition]
+
+# Extract clinic 1 data into yearly1 and clinic 2 data into yearly2
+yearly1 = yearly[yearly["clinic"] == "clinic 1"]
+yearly2 = yearly[yearly["clinic"] == "clinic 2"]
