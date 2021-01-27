@@ -34,4 +34,94 @@ print(sales[["temperature_c", "fuel_price_usd_per_l", "unemployment"]].agg(iqr))
 # Update to print IQR and median of temperature_c, fuel_price_usd_per_l, & unemployment
 print(sales[["temperature_c", "fuel_price_usd_per_l", "unemployment"]].agg([iqr,np.median]))
 
+# Count the number of stores of each type
+store_counts = store_types["type"].value_counts()
+print(store_counts)
+
+# Get the proportion of stores of each type
+#print(store_depts.head())
+store_props = store_types["type"].value_counts(normalize=True)
+print(store_props)
+
+
+
+# Count the number of each department number and sort
+dept_counts_sorted = store_depts["department"].value_counts(sort=True)
+print(dept_counts_sorted)
+
+# Get the proportion of departments of each number and sort
+dept_props_sorted = store_depts["department"].value_counts(sort=True, normalize=True)
+print(dept_props_sorted)
+
+# Calc total weekly sales
+sales_all = sales["weekly_sales"].sum()
+
+# Subset for type A stores, calc total weekly sales
+sales_A = sales[sales["type"] == "A"]["weekly_sales"].sum()
+
+# Subset for type B stores, calc total weekly sales
+sales_B = sales[sales["type"] == "B"]["weekly_sales"].sum()
+
+# Subset for type C stores, calc total weekly sales
+sales_C = sales[sales["type"] == "C"]["weekly_sales"].sum()
+
+# Get proportion for each type
+sales_propn_by_type = [sales_A, sales_B, sales_C] /sales_all
+print(sales_propn_by_type)
+
+# From previous step
+sales_by_type = sales.groupby("type")["weekly_sales"].sum()
+
+# Group by type and is_holiday; calc total weekly sales
+sales_by_type_is_holiday = sales.groupby(["type","is_holiday"])["weekly_sales"].sum()
+print(sales_by_type_is_holiday)
+
+
+ For each store type, aggregate weekly_sales: get min, max, mean, and median
+sales_stats = sales.groupby("type")["weekly_sales"].agg([np.min,np.max,np.mean,np.median])
+
+# Print sales_stats
+print(sales_stats)
+
+# For each store type, aggregate unemployment and fuel_price_usd_per_l: get min, max, mean, and median
+unemp_fuel_stats = sales.groupby("type")[["unemployment","fuel_price_usd_per_l"]].agg([np.min,np.max,np.mean,np.median])
+
+print(unemp_fuel_stats)
+
+
+
+# Import NumPy as np
+import numpy as np
+
+# Pivot for mean and median weekly_sales for each store type
+mean_med_sales_by_type = sales.pivot_table(values="weekly_sales",index="type", aggfunc=[np.mean,np.median])
+
+# Print mean_med_sales_by_type
+print(mean_med_sales_by_type)
+
+# Pivot for mean weekly_sales by store type and holiday 
+mean_sales_by_type_holiday = sales.pivot_table(values="weekly_sales", index="type" , columns="is_holiday")
+
+# Print mean_sales_by_type_holiday
+print(mean_sales_by_type_holiday)
+
+The .pivot_table() method has several useful arguments, including fill_value and margins.
+
+fill_value replaces missing values with a real value (known as imputation). What to replace missing values with is a topic big enough to have its own course (Dealing with Missing Data in Python), but the simplest thing to do is to substitute a dummy value.
+margins is a shortcut for when you pivoted by two variables, but also wanted to pivot by each of those variables separately: it gives the row and column totals of the pivot table contents.
+
+
+# Print mean weekly_sales by department and type; fill missing values with 0
+print(sales.pivot_table(values="weekly_sales", index="department", columns="type", fill_value=0, margins=True))
+
+
+# Make a list of cities to subset on
+cities = ["Moscow", "Saint Petersburg"]
+
+# Subset temperatures using square brackets
+print(temperatures[temperatures["city"].isin(cities)])
+
+# Subset temperatures_ind using .loc[]
+print(temperatures_ind.loc[cities])
+
 Remember that the summary functions should be passed to .agg() as a list.
